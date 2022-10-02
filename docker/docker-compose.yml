@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  firebase-emulator:
+    build:
+      context: ../firebase-emulator
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+  firesert:
+    image: jonnyorman/firesert:latest
+    env_file:
+      - ../.env
+    environment:
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      - firebase-emulator
+  firead:
+    image: jonnyorman/firead:latest
+    env_file:
+      - ../.env
+    environment:
+      PORT: 3002
+    ports:
+      - "3002:3002"
+    depends_on:
+      - firebase-emulator
+  firelete:
+    image: jonnyorman/firelete:latest
+    env_file:
+      - ../.env
+    environment:
+      PORT: 3003
+    ports:
+      - "3003:3003"
+    depends_on:
+      - firebase-emulator
