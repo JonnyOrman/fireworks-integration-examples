@@ -6,20 +6,23 @@ services:
     ports:
       - "4000:4000"
       - "8080:8080"
-  firesert:
+      - "8085:8085"
+  pubsubmit-create:
     build:
-      context: ./firesert
+      context: ./pubsubmit-create
     env_file:
       - ../.env
     environment:
       PORT: 3001
+      OPERATION: "create"
+      PUBSUB_EMULATOR_HOST: firebase-emulator:8085
     ports:
       - "3001:3001"
     depends_on:
-      - firebase-emulator
-  firead:
+      - pubsub-setup
+  firesert:
     build:
-      context: ./firead
+      context: ./firesert
     env_file:
       - ../.env
     environment:
@@ -28,14 +31,32 @@ services:
       - "3002:3002"
     depends_on:
       - firebase-emulator
-  firelete:
+  firead:
     build:
-      context: ./firelete
+      context: ./firead
     env_file:
       - ../.env
     environment:
       PORT: 3003
     ports:
       - "3003:3003"
+    depends_on:
+      - firebase-emulator
+  firelete:
+    build:
+      context: ./firelete
+    env_file:
+      - ../.env
+    environment:
+      PORT: 3004
+    ports:
+      - "3004:3004"
+    depends_on:
+      - firebase-emulator
+  pubsub-setup:
+    image: jonnyorman/pubsub-provisioner:latest
+    environment:
+      PUBSUB_EMULATOR_HOST: firebase-emulator:8085
+      PUBSUB_CONFIG: '{ "projectId": "my-fireworks-project", "topics": [ { "topicId": "MyCollection-create-submit", "subscriptions": [ { "type": "push", "subscriptionId": "MyCollection-submit-complete", "ackDeadlineSeconds": 10, "pushEndpoint": "http://firesert:3002" } ] } ] }'
     depends_on:
       - firebase-emulator
