@@ -15,15 +15,30 @@ To run an example, run `docker-compose up --build` in its directory.
 
 It will run three services:
 
-- `localhost:3001` - create firestore documents using `firesert`.
-- `localhost:3002` - read firestore documents using `firead`.
-- `localhost:3003` - delete firestore documents using `firelete`.
+- `localhost:3001` - submit document data using `pubsubmit`.
+- `localhost:3002` - create firestore documents using `firesert`.
+- `localhost:3003` - read firestore documents using `firead`.
+- `localhost:3004` - delete firestore documents using `firelete`.
+
+### pubsubmit-create
+
+The pubsubmit-create service is used to submit data to be published to a creation submission Pub/Sub topic.
+
+To trigger it, submit a `POST` to `localhost:3001` with the `Content-Type` header set to `application/json` and a body containing the data you would like to submit, such as this:
+```
+{
+    {
+        "prop1": "abc",
+        "prop2": 123
+    }
+}
+```
 
 ### firesert service
 
-The firesert service receives Pub/Sub push messages and inserts their data into a firestore collection.
+The firesert service receives Pub/Sub messages pushed from the creation submission Pub/Sub topic and inserts their data into a firestore collection.
 
-To trigger it, submit a `POST` to `localhost:3001` with the `Content-Type` header set to `application/json` and the following body:
+It can also be triggered directly by submitting a `POST` to `localhost:3002` with the `Content-Type` header set to `application/json` and the following body:
 ```
 {
     "message": {
@@ -46,13 +61,13 @@ The document will be inserted into a collection called "MyCollection". You can v
 
 The firead service receives requests for firestore documents and returns them in the response body.
 
-After creating a document, submit a `GET` to `localhost:3002/{documentID}`. Check the emulator UI for the ID of the document you created and substitute it into the url. For example, if you created a document with the ID "kFdcuYv6z8AmjcI2REgC", use the URL `localhost:3002/kFdcuYv6z8AmjcI2REgC`.
+After creating a document, submit a `GET` to `localhost:3003/{documentID}`. Check the emulator UI for the ID of the document you created and substitute it into the url. For example, if you created a document with the ID "kFdcuYv6z8AmjcI2REgC", use the URL `localhost:3002/kFdcuYv6z8AmjcI2REgC`.
 
 ### firelete service
 
 The firelete service receives Pub/Sub push messages and deletes the document from firestore with the document ID specified in the message.
 
-To trigger it, submit a `POST` to `localhost:3003` with a `Content-Type` header set to `application/json` and the following body:
+To trigger it, submit a `POST` to `localhost:3004` with a `Content-Type` header set to `application/json` and the following body:
 ```
 {
     "message": {
